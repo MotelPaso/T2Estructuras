@@ -13,9 +13,8 @@ public:
   LinkedList<T>() : head(nullptr){};
   ~LinkedList();
   int lentejas();
-  void append(const T &data);
-  void append(T *data);
-  T *get(int index);
+  void append(T data);
+  T get(int index);
   bool isEmpty();
   std::string mostrar();
   void removeAt(int index);

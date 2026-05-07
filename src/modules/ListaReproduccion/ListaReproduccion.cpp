@@ -97,8 +97,39 @@ void ListaReproduccion::remove()
   temp->next = nullptr;
   delete end;
   end = temp;
+  this->size--;
   return;
 };
+
+bool ListaReproduccion::estaReproduciendo()
+{
+  return this->reproduciendo;
+}
+
+bool ListaReproduccion::esAleatorio()
+{
+  return this->aleatorio;
+}
+
+string ListaReproduccion::getTipoRepeticion()
+{
+  return this->tipoRepeticion;
+}
+
+int ListaReproduccion::getIndiceActual()
+{
+  int index = 0;
+  DNodo *temp = head;
+
+  while (temp != nullptr && temp != actual)
+  {
+    temp = temp->next;
+    index++;
+  }
+
+  return index;
+}
+
 
 void ListaReproduccion::activarAleatorio()
 {
@@ -183,10 +214,36 @@ else
 {
   datos += ": ";
 }
-  datos += tipoRepeticion != "R0" ? "-" + tipoRepeticion + ")" : ":";
-
   datos += " " + this->actual->cancion->mostrarEstado();
   return datos;
+}
+void ListaReproduccion::setReproduciendo(bool estado)
+{
+  this->reproduciendo = estado;
+}
+void ListaReproduccion::setAleatorio(bool estado)
+{
+  this->aleatorio = estado;
+}
+void ListaReproduccion::moverAIndice(int indice)
+{
+  if (indice < 0 || head == nullptr)
+  {
+    return;
+  }
+
+  DNodo *temp = head;
+  int contador = 0;
+
+  while (temp != nullptr && contador < indice)
+  {
+    temp = temp->next;
+    contador++;
+  }
+  if (temp != nullptr)
+  {
+    actual = temp;
+  }
 }
 
 void ListaReproduccion::togglePlayStop()
@@ -195,21 +252,51 @@ void ListaReproduccion::togglePlayStop()
 }
 void ListaReproduccion::avanzar()
 {
-  if (this->actual == nullptr || this->actual->next == nullptr)
+  if (actual == nullptr)
   {
     return;
   }
-  actual = actual->next;
-  return;
+  if (tipoRepeticion == "R1")
+  {
+    return;
+  }
+  if (actual->next != nullptr)
+  {
+    actual = actual->next;
+    return;
+  }
+  if (tipoRepeticion == "RA")
+  {
+    actual = head;
+
+    if (aleatorio)
+    {
+      activarAleatorio();
+    }
+
+    return;
+  }
 }
 void ListaReproduccion::retroceder()
 {
-  if (this->actual == nullptr || this->actual->prev == nullptr)
+  if (actual == nullptr)
   {
     return;
   }
-  actual = actual->prev;
-  return;
+  if (tipoRepeticion == "R1")
+  {
+    return;
+  }
+  if (actual->prev != nullptr)
+  {
+    actual = actual->prev;
+    return;
+  }
+  if (tipoRepeticion == "RA")
+  {
+    actual = end;
+    return;
+  }
 }
 void ListaReproduccion::clear()
 {

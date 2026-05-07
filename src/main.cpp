@@ -9,7 +9,7 @@
 using namespace std;
 
 // global lists
-LinkedList<Cancion> *listadoCanciones = new LinkedList<Cancion>();
+LinkedList<Cancion*> *listadoCanciones = new LinkedList<Cancion*>();
 ListaReproduccion *listaReproduccion = new ListaReproduccion();
 
 void limpiarPantalla()
@@ -71,6 +71,43 @@ bool cargarMusica()
 
 bool cargarOpciones()
 {
+  fstream arch("../status.cfg");
+
+  if (!arch)
+  {
+    return true;
+  }
+
+  int indiceActual;
+  int reproduciendo;
+  int aleatorio;
+  string repeticion;
+
+  arch >> indiceActual;
+  arch >> reproduciendo;
+  arch >> aleatorio;
+  arch >> repeticion;
+
+  if (arch.fail())
+  {
+    arch.close();
+    return false;
+  }
+
+  arch.close();
+
+  listaReproduccion->clear();
+
+  for (int i = 0; i < listadoCanciones->lentejas(); i++)
+  {
+    listaReproduccion->append(listadoCanciones->get(i));
+  }
+
+  listaReproduccion->moverAIndice(indiceActual);
+  listaReproduccion->setReproduciendo(reproduciendo == 1);
+  listaReproduccion->setAleatorio(aleatorio == 1);
+  listaReproduccion->repetir(repeticion);
+
   return true;
 }
 
@@ -332,6 +369,26 @@ void cambiarRepeticion()
 
   estado = (estado + 1) % 3;
 }
+void guardarEstado()
+{
+  fstream arch("../status.cfg", ios::out);
+
+  if (!arch)
+  {
+    cout << "Error guardando estado" << endl;
+    return;
+  }
+
+  arch << listaReproduccion->getIndiceActual() << endl;
+  arch << listaReproduccion->estaReproduciendo() << endl;
+  arch << listaReproduccion->esAleatorio() << endl;
+  arch << listaReproduccion->getTipoRepeticion() << endl;
+
+  arch.close();
+}
+
+
+
 
 int main()
 {
@@ -381,6 +438,7 @@ int main()
       menuCanciones();
       break;
     case 'X':
+      guardarEstado();
       cout << "Adios!" << endl;
       break;
     default:
@@ -389,6 +447,6 @@ int main()
     }
   } while (opcion != 'X');
 
-  cleanUp();
+  cleanUp();  
   return 0;
 }

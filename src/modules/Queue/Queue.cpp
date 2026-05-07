@@ -38,7 +38,12 @@ void Queue<T>::pop()
 template <typename T>
 T *Queue<T>::front()
 {
-  return this->first->getData();
+  if (this->isEmpty())
+{
+    return nullptr;
+}
+
+return this->first->getData();
 }
 
 template <typename T>

@@ -2,20 +2,22 @@
 template <typename T>
 class Node
 {
+private:
   T data;
   Node<T> *next;
 
 public:
-  Node() : next(nullptr) {};
-  Node(T data) : data(data), next(nullptr) {};
-  Node(T *data) : data(*data), next(nullptr) {};
+  Node(T data) : data(data), next(nullptr) {}
 
-  T *getData()
+  T getData()
   {
-    return &data;
-  };
-  Node<T> *getNext() { return next; }
-  void setData(const T &data)
+    return data;
+  }
+  Node<T> *getNext()
+  {
+    return next;
+  }
+  void setData(T data)
   {
     this->data = data;
   }

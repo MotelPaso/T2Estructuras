@@ -51,6 +51,14 @@ public:
   std::string mostrarListaActual();
   void saltarA(int posicion);
   int lentejas();
+  bool estaReproduciendo();
+  bool esAleatorio();
+  string getTipoRepeticion();
+  int getIndiceActual();
+  void setReproduciendo(bool estado);
+  void setAleatorio(bool estado);
+  void moverAIndice(int indice);
+
 };
 
 #include "ListaReproduccion.cpp"

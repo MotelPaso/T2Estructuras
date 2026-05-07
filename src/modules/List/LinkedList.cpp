@@ -20,17 +20,19 @@ int LinkedList<T>::lentejas()
 }
 
 template <typename T>
-T *LinkedList<T>::get(int index)
+T LinkedList<T>::get(int index)
 {
-  if (index >= this->lentejas() || index < 0)
-    throw std::out_of_range("diego te pasaste de numero");
+    if (index < 0 || index >= this->size)
+        throw std::out_of_range("Indice fuera de rango");
 
-  Node<T> *temp = this->head;
-  for (int i = 0; i < index; i++)
-  {
-    temp = temp->getNext();
-  }
-  return temp->getData();
+    Node<T>* temp = this->head;
+
+    for (int i = 0; i < index; i++)
+    {
+        temp = temp->getNext();
+    }
+
+    return temp->getData();
 };
 
 template <typename T>
@@ -65,25 +67,7 @@ void LinkedList<T>::removeAt(int index)
 }
 
 template <typename T>
-void LinkedList<T>::append(const T &data)
-{
-  Node<T> *newNode = new Node<T>(data);
-  if (this->isEmpty())
-  {
-    head = newNode;
-    this->size = 1;
-    return;
-  }
-  Node<T> *temp = head;
-  while (temp->hasNext())
-  {
-    temp = temp->getNext();
-  }
-  temp->setNext(newNode);
-  this->size += 1;
-};
-template <typename T>
-void LinkedList<T>::append(T *data)
+void LinkedList<T>::append(T data)
 {
   Node<T> *newNode = new Node<T>(data);
   if (this->isEmpty())

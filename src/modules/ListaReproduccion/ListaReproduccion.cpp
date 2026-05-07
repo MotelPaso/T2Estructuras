@@ -41,24 +41,39 @@ std::string ListaReproduccion::mostrarListaActual()
 
 void ListaReproduccion::saltarA(int posicion)
 {
-  if (posicion <= 0 || this->actual == nullptr)
+  if (posicion <= 0 || actual == nullptr || actual->next == nullptr)
   {
     return;
   }
 
-  DNodo *temp = this->actual->next;
+  DNodo *objetivo = actual->next;
   int contador = 1;
 
-  while (temp != nullptr && contador < posicion)
+  while (objetivo != nullptr && contador < posicion)
   {
-    temp = temp->next;
+    objetivo = objetivo->next;
     contador++;
   }
 
-  if (temp != nullptr)
+  if (objetivo == nullptr)
   {
-    this->actual = temp;
+    return;
   }
+
+  DNodo *temp = actual->next;
+
+  while (temp != objetivo)
+  {
+    DNodo *eliminar = temp;
+    temp = temp->next;
+    delete eliminar;
+    size--;
+  }
+
+  actual->next = objetivo;
+  objetivo->prev = actual;
+
+  actual = objetivo;
 }
 
 void ListaReproduccion::append(Cancion *c)
@@ -105,17 +120,14 @@ bool ListaReproduccion::estaReproduciendo()
 {
   return this->reproduciendo;
 }
-
 bool ListaReproduccion::esAleatorio()
 {
   return this->aleatorio;
 }
-
 string ListaReproduccion::getTipoRepeticion()
 {
   return this->tipoRepeticion;
 }
-
 int ListaReproduccion::getIndiceActual()
 {
   int index = 0;
@@ -315,4 +327,60 @@ void ListaReproduccion::clear()
 int ListaReproduccion::lentejas()
 {
   return this->size;
+}
+
+void ListaReproduccion::eliminarCancion(Cancion *c)
+{
+  DNodo *temp = head;
+
+  while (temp != nullptr)
+  {
+    DNodo *siguiente = temp->next;
+
+    if (temp->cancion == c)
+    {
+      if (temp == head)
+      {
+        head = temp->next;
+      }
+
+      if (temp == end)
+      {
+        end = temp->prev;
+      }
+
+      if (temp == actual)
+      {
+        actual = temp->next;
+
+        if (actual == nullptr)
+        {
+          actual = temp->prev;
+        }
+      }
+
+      if (temp->prev != nullptr)
+      {
+        temp->prev->next = temp->next;
+      }
+
+      if (temp->next != nullptr)
+      {
+        temp->next->prev = temp->prev;
+      }
+
+      delete temp;
+      size--;
+    }
+
+    temp = siguiente;
+  }
+
+  if (size == 0)
+  {
+    head = nullptr;
+    actual = nullptr;
+    end = nullptr;
+    reproduciendo = false;
+  }
 }

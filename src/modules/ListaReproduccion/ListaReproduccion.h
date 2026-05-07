@@ -58,6 +58,7 @@ public:
   void setReproduciendo(bool estado);
   void setAleatorio(bool estado);
   void moverAIndice(int indice);
+  void eliminarCancion(Cancion *c);
 
 };
 

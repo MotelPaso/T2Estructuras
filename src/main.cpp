@@ -11,7 +11,7 @@ using namespace std;
 // global lists
 LinkedList<Cancion*> *listadoCanciones = new LinkedList<Cancion*>();
 ListaReproduccion *listaReproduccion = new ListaReproduccion();
-
+void guardarEstado();
 void limpiarPantalla()
 {
 #ifdef _WIN32
@@ -34,25 +34,33 @@ void mostrarOpciones()
   cout << "X - Salir" << endl;
   cout << "Ingrese Opción: ";
 };
-
+bool esSeparador(char c)
+{
+  return c == ',';
+}
 bool cargarMusica()
 {
   fstream arch("../music_source.txt");
+
   if (!arch)
   {
     return false;
   }
+
   string linea;
+
   while (getline(arch, linea))
   {
     string datos[7];
     int i = 0;
     string actual = "";
+
     for (int j = 0; j < linea.size(); j++)
     {
-      if (linea[j] == ',')
+      if (esSeparador(linea[j]) && i < 6)
       {
-        datos[i++] = actual; // primero lo agarra, despues lo suma
+        datos[i] = actual;
+        i++;
         actual = "";
       }
       else
@@ -60,11 +68,26 @@ bool cargarMusica()
         actual += linea[j];
       }
     }
+
     datos[i] = actual;
 
-    Cancion *c = new Cancion(stoi(datos[0]), datos[1], datos[2], datos[3], stoi(datos[4]), stoi(datos[5]), datos[6]);
+    if (i < 6)
+    {
+      continue; 
+    }
+
+    Cancion *c = new Cancion(
+        stoi(datos[0]),
+        datos[1],
+        datos[2],
+        datos[3],
+        stoi(datos[4]),
+        stoi(datos[5]),
+        datos[6]);
+
     listadoCanciones->append(c);
   }
+
   arch.close();
   return true;
 };
@@ -182,12 +205,23 @@ void menuCanciones()
     {
       if (opcionL.length() > 1)
       {
-        int num = stoi(opcionL.substr(1));
+      
+      int num;
 
+      try
+        {
+          num = stoi(opcionL.substr(1));
+        }
+      catch (...)
+        {
+          cout << "Numero invalido." << endl;
+          continue;
+        }
         if (num >= 1 && num <= listadoCanciones->lentejas())
         {
           Cancion *c = listadoCanciones->get(num - 1);
           listaReproduccion->append(c);
+          guardarEstado();
 
           cout << c->mostrar() << " agregada a la lista." << endl;
         }
@@ -205,14 +239,39 @@ void menuCanciones()
     {
       if (opcionL.length() > 1)
       {
-        int num = stoi(opcionL.substr(1));
+      int num;
 
+    try
+      {
+        num = stoi(opcionL.substr(1));
+      }
+    catch (...)
+      {
+        cout << "Numero invalido." << endl;
+        continue;
+      }
         if (num >= 1 && num <= listadoCanciones->lentejas())
         {
           Cancion *c = listadoCanciones->get(num - 1);
-          listaReproduccion->clear();          // limpiar lista
-          listaReproduccion->append(c);        // agregar canción
-          listaReproduccion->togglePlayStop(); // reproducir
+        listaReproduccion->clear();
+
+        listaReproduccion->append(c);
+
+        for (int i = 0; i < listadoCanciones->lentejas(); i++)
+        {
+          Cancion *otraCancion = listadoCanciones->get(i);
+
+          if (otraCancion != c)
+          {
+            listaReproduccion->append(otraCancion);
+          }
+        }
+
+        listaReproduccion->activarAleatorio();
+
+        listaReproduccion->setReproduciendo(true);
+
+guardarEstado();
 
           cout << "Reproduciendo: " << c->mostrar() << endl;
         }
@@ -262,23 +321,35 @@ void menuCanciones()
 
       cout << "Cancion agregada correctamente." << endl;
       guardarMusicSource();
+      guardarEstado();
     }
     else if (opcionL[0] == 'D' || opcionL[0] == 'd')
     {
     
     if (opcionL.length() > 1)
       {
-      int num = stoi(opcionL.substr(1));
+      int num;
 
+    try
+    {
+      num = stoi(opcionL.substr(1));
+    }
+    catch (...)
+    {
+      cout << "Numero invalido." << endl;
+      continue;
+      }
     if (num >= 1 && num <= listadoCanciones->lentejas())
       {
       Cancion *c = listadoCanciones->get(num - 1);
       cout << "Eliminando: " << c->mostrar() << endl;
 
+      listaReproduccion->eliminarCancion(c);
       listadoCanciones->removeAt(num - 1);
 
       cout << "Cancion eliminada correctamente." << endl;
       guardarMusicSource();
+      guardarEstado();
     }
     else
     {
@@ -329,9 +400,22 @@ void menuListaReproduccion()
     else if (opcionA[0] == 'S' || opcionA[0] == 's')
     {
       if (opcionA.length() > 1)
+      { 
+    
+        int num;
+
+    try
       {
-        int num = stoi(opcionA.substr(1));
+        num = stoi(opcionA.substr(1));
+      }
+    catch (...)
+      {
+        cout << "Numero invalido." << endl;
+        continue;
+      }
+
         listaReproduccion->saltarA(num);
+        guardarEstado();
         return;
       }
       else
@@ -417,19 +501,25 @@ int main()
     {
     case 'W':
       listaReproduccion->togglePlayStop();
+      guardarEstado();
       break;
     case 'Q':
       listaReproduccion->retroceder();
+      guardarEstado();
       break;
     case 'E':
       listaReproduccion->avanzar();
+      guardarEstado();
       break;
     case 'S':
       listaReproduccion->activarAleatorio();
+      guardarEstado();
       cout << "Modo aleatorio cambiado" << endl;
       break;
     case 'R':
       cambiarRepeticion();
+      guardarEstado();
+
       break;
     case 'A':
       menuListaReproduccion();

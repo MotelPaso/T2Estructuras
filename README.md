@@ -8,15 +8,15 @@ Para compilarlo y correrlo, se utilizó el siguiente comando:
 
 ```
 git clone https://github.com/MotelPaso/T1Estructuras
-cd T1Estructuras
-g++ main.cpp -o main
-./main
+cd T1Estructuras/src
+g++ main.cpp -o taller1
+./taller1
 ```
 
-Si se desea revisar utilizando otro sistema operativo, se puede utilizar el archivo `main` del repositorio con los siguientes comandos:
+Si se desea revisar utilizando otro sistema operativo, se puede utilizar el archivo `taller1` del repositorio con los siguientes comandos:
 
 ```
 git clone https://github.com/MotelPaso/T1Estructuras
-cd T1Estructuras
-./main
+cd T1Estructuras/src
+./taller1
 ```

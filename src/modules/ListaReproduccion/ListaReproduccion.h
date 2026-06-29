@@ -40,6 +40,7 @@ public:
   // R1 -> se repite uno
   // RA -> se repite todo
   std::string repetir(std::string r);
+  // Devuelve el estado actual de la cancion
   std::string getEstadoActual();
   // Cambia el estado de la primera cancion a sonando.
   void togglePlayStop();
@@ -47,10 +48,12 @@ public:
   void avanzar();
   // Retrocede una cancion en la lista
   void retroceder();
+  // borra la lista de reproduccion
   void clear();
   std::string mostrarListaActual();
   void saltarA(int posicion);
   int lentejas();
+
   bool estaReproduciendo();
   bool esAleatorio();
   string getTipoRepeticion();
@@ -59,7 +62,6 @@ public:
   void setAleatorio(bool estado);
   void moverAIndice(int indice);
   void eliminarCancion(Cancion *c);
-
 };
 
 #include "ListaReproduccion.cpp"

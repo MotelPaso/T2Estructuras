@@ -118,6 +118,7 @@ void ListaReproduccion::remove()
 
 bool ListaReproduccion::estaReproduciendo()
 {
+  this->actual->cancion->agregarReproduccion(); // sumar uno a la wea
   return this->reproduciendo;
 }
 bool ListaReproduccion::esAleatorio()
@@ -141,7 +142,6 @@ int ListaReproduccion::getIndiceActual()
 
   return index;
 }
-
 
 void ListaReproduccion::activarAleatorio()
 {
@@ -209,23 +209,23 @@ std::string ListaReproduccion::getEstadoActual()
   {
     datos += "(";
 
-  if (aleatorio)
-    datos += "S";
-
-  if (tipoRepeticion != "R0")
-  {
     if (aleatorio)
-      datos += "-";
+      datos += "S";
 
-    datos += tipoRepeticion;
+    if (tipoRepeticion != "R0")
+    {
+      if (aleatorio)
+        datos += "-";
+
+      datos += tipoRepeticion;
+    }
+
+    datos += "): ";
   }
-
-  datos += "): ";
-}
-else
-{
-  datos += ": ";
-}
+  else
+  {
+    datos += ": ";
+  }
   datos += " " + this->actual->cancion->mostrarEstado();
   return datos;
 }

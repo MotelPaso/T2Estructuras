@@ -13,9 +13,11 @@ private:
   int duracion;
   string filePath;
   bool sonando = false;
+  // cantReproducciones
+  int cantReproducciones = 0;
 
 public:
-  Cancion(int id, string titulo, string autor, string album, int year, int duracion, string filePath)
+  Cancion(int id, string titulo, string autor, string album, int year, int duracion, string filePath, int cantReproducciones)
   {
     this->id = id;
     this->titulo = titulo;
@@ -24,6 +26,7 @@ public:
     this->year = year;
     this->duracion = duracion;
     this->filePath = filePath;
+    this->cantReproducciones = cantReproducciones;
   };
   int getId() const { return id; }
   string getTitulo() const { return titulo; }
@@ -32,6 +35,12 @@ public:
   int getYear() const { return year; }
   int getDuracion() const { return duracion; }
   string getFilePath() const { return filePath; }
+  int getCantReproducciones() const { return cantReproducciones; }
+
+  void agregarReproduccion()
+  {
+    this->cantReproducciones += 1;
+  }
 
   ~Cancion() {};
   string mostrar() const

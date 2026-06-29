@@ -1,16 +1,16 @@
-1,Fire Dance,Vivid BAD Squad,Fire Dance (Single),2025,214,music/vivid_bad_squad/fire_dance.mp3
-2,PON PON PON,Kyary Pamyu Pamyu,Moshi Moshi Harajuku,2011,218,music/kyary_pamyu_pamyu/pon_pon_pon.mp3
-3,World is Mine,Ryo feat. Hatsune Miku,World is Mine (Single),2008,310,music/hatsune_miku/world_is_mine.mp3
-4,Crossing Field,LiSA,crossing field (Single),2012,267,music/lisa/crossing_field.mp3
-5,Show,Ado,Show (Single),2023,196,music/ado/show.mp3
-6,Bring Me to Life,Evanescence,Fallen,2003,223,music/evanescence/bring_me_to_life.mp3
-7,Radioactive,Imagine Dragons,Night Visions,2012,186,music/imagine_dragons/radioactive.mp3
-8,Titanium,David Guetta feat. Sia,Nothing but the Beat,2011,245,music/david_guetta/titanium.mp3
-9,Chandelier,Sia,1000 Forms of Fear,2014,218,music/sia/chandelier.mp3
-10,MORE,K/DA,MORE (Single),2020,193,music/kda/more.mp3
-11,Gimme Chocolate!!,BABYMETAL,BABYMETAL,2014,259,music/babymetal/gimme_chocolate.mp3
-12,DESPECHA,Rosalia,MOTOMAMI,2022,175,music/rosalia/despecha.mp3
-13,I Was Made for Lovin You,KISS,Dynasty,1979,270,music/kiss/i_was_made_for_lovin_you.mp3
-14,Bohemian Rhapsody,Queen,A Night at the Opera,1975,354,music/queen/bohemian_rhapsody.mp3
-15,Blinding Lights,The Weeknd,After Hours,2019,200,music/the_weeknd/blinding_lights.mp3
-16,DIEGO,MALEBRAN,FF,2005,123,music_source.txt
+1,Fire Dance,Vivid BAD Squad,Fire Dance (Single),2025,214,music/vivid_bad_squad/fire_dance.mp3,0
+2,PON PON PON,Kyary Pamyu Pamyu,Moshi Moshi Harajuku,2011,218,music/kyary_pamyu_pamyu/pon_pon_pon.mp3,0
+3,World is Mine,Ryo feat. Hatsune Miku,World is Mine (Single),2008,310,music/hatsune_miku/world_is_mine.mp3,0
+4,Crossing Field,LiSA,crossing field (Single),2012,267,music/lisa/crossing_field.mp3,0
+5,Show,Ado,Show (Single),2023,196,music/ado/show.mp3,0
+6,Bring Me to Life,Evanescence,Fallen,2003,223,music/evanescence/bring_me_to_life.mp3,0
+7,Radioactive,Imagine Dragons,Night Visions,2012,186,music/imagine_dragons/radioactive.mp3,0
+8,Titanium,David Guetta feat. Sia,Nothing but the Beat,2011,245,music/david_guetta/titanium.mp3,0
+9,Chandelier,Sia,1000 Forms of Fear,2014,218,music/sia/chandelier.mp3,0
+10,MORE,K/DA,MORE (Single),2020,193,music/kda/more.mp3,0
+11,Gimme Chocolate!!,BABYMETAL,BABYMETAL,2014,259,music/babymetal/gimme_chocolate.mp3,0
+12,DESPECHA,Rosalia,MOTOMAMI,2022,175,music/rosalia/despecha.mp3,0
+13,I Was Made for Lovin You,KISS,Dynasty,1979,270,music/kiss/i_was_made_for_lovin_you.mp3,0
+14,Bohemian Rhapsody,Queen,A Night at the Opera,1975,354,music/queen/bohemian_rhapsody.mp3,0
+15,Blinding Lights,The Weeknd,After Hours,2019,200,music/the_weeknd/blinding_lights.mp3,0
+16,DIEGO,MALEBRAN,FF,2005,123,music_source.txt,0

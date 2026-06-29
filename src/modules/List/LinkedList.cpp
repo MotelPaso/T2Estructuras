@@ -22,18 +22,34 @@ int LinkedList<T>::lentejas()
 template <typename T>
 T LinkedList<T>::get(int index)
 {
-    if (index < 0 || index >= this->size)
-        throw std::out_of_range("Indice fuera de rango");
+  if (index < 0 || index >= this->size)
+    throw std::out_of_range("Indice fuera de rango");
 
-    Node<T>* temp = this->head;
+  Node<T> *temp = this->head;
 
-    for (int i = 0; i < index; i++)
-    {
-        temp = temp->getNext();
-    }
+  for (int i = 0; i < index; i++)
+  {
+    temp = temp->getNext();
+  }
 
-    return temp->getData();
+  return temp->getData();
 };
+
+template <typename T>
+Node<T> *LinkedList<T>::getPunteroAt(int index)
+{
+  if (index < 0 || index >= this->size)
+    throw std::out_of_range("Indice fuera de rango");
+
+  Node<T> *temp = this->head;
+
+  for (int i = 0; i < index; i++)
+  {
+    temp = temp->getNext();
+  }
+
+  return temp;
+}
 
 template <typename T>
 void LinkedList<T>::removeAt(int index)
@@ -87,7 +103,7 @@ void LinkedList<T>::append(T data)
 
 template <typename T>
 bool LinkedList<T>::isEmpty()
-{ 
+{
   return head == nullptr;
 };
 

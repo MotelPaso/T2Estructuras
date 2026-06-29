@@ -6,10 +6,11 @@
 #include "modules/List/LinkedList.h"
 #include "modules/Cancion/Cancion.h"
 #include "modules/ListaReproduccion/ListaReproduccion.h"
+#include "modules/Heap/Heap.h"
 using namespace std;
 
 // global lists
-LinkedList<Cancion*> *listadoCanciones = new LinkedList<Cancion*>();
+LinkedList<Cancion *> *listadoCanciones = new LinkedList<Cancion *>();
 ListaReproduccion *listaReproduccion = new ListaReproduccion();
 void guardarEstado();
 void limpiarPantalla()
@@ -31,6 +32,8 @@ void mostrarOpciones()
   cout << "R - Repetición (Desactivado/Repetir una/Repetir todas)" << endl;
   cout << "A - Ver lista de reproducción actual" << endl;
   cout << "L - Listado de canciones" << endl;
+  cout << "F - Buscar canciones" << endl;
+  cout << "T - TOP 10 Artistas y Canciones" << endl;
   cout << "X - Salir" << endl;
   cout << "Ingrese Opción: ";
 };
@@ -51,13 +54,13 @@ bool cargarMusica()
 
   while (getline(arch, linea))
   {
-    string datos[7];
+    string datos[8];
     int i = 0;
     string actual = "";
 
     for (int j = 0; j < linea.size(); j++)
     {
-      if (esSeparador(linea[j]) && i < 6)
+      if (esSeparador(linea[j]) && i < 7)
       {
         datos[i] = actual;
         i++;
@@ -71,9 +74,9 @@ bool cargarMusica()
 
     datos[i] = actual;
 
-    if (i < 6)
+    if (i < 7)
     {
-      continue; 
+      continue;
     }
 
     Cancion *c = new Cancion(
@@ -83,7 +86,8 @@ bool cargarMusica()
         datos[3],
         stoi(datos[4]),
         stoi(datos[5]),
-        datos[6]);
+        datos[6],
+        stoi(datos[7]));
 
     listadoCanciones->append(c);
   }
@@ -168,7 +172,8 @@ void guardarMusicSource()
          << c->getAlbum() << ","
          << c->getYear() << ","
          << c->getDuracion() << ","
-         << c->getFilePath();
+         << c->getFilePath() << ','
+         << c->getCantReproducciones();
 
     if (i < listadoCanciones->lentejas() - 1)
     {
@@ -205,14 +210,14 @@ void menuCanciones()
     {
       if (opcionL.length() > 1)
       {
-      
-      int num;
 
-      try
+        int num;
+
+        try
         {
           num = stoi(opcionL.substr(1));
         }
-      catch (...)
+        catch (...)
         {
           cout << "Numero invalido." << endl;
           continue;
@@ -239,39 +244,39 @@ void menuCanciones()
     {
       if (opcionL.length() > 1)
       {
-      int num;
+        int num;
 
-    try
-      {
-        num = stoi(opcionL.substr(1));
-      }
-    catch (...)
-      {
-        cout << "Numero invalido." << endl;
-        continue;
-      }
+        try
+        {
+          num = stoi(opcionL.substr(1));
+        }
+        catch (...)
+        {
+          cout << "Numero invalido." << endl;
+          continue;
+        }
         if (num >= 1 && num <= listadoCanciones->lentejas())
         {
           Cancion *c = listadoCanciones->get(num - 1);
-        listaReproduccion->clear();
+          listaReproduccion->clear();
 
-        listaReproduccion->append(c);
+          listaReproduccion->append(c);
 
-        for (int i = 0; i < listadoCanciones->lentejas(); i++)
-        {
-          Cancion *otraCancion = listadoCanciones->get(i);
-
-          if (otraCancion != c)
+          for (int i = 0; i < listadoCanciones->lentejas(); i++)
           {
-            listaReproduccion->append(otraCancion);
+            Cancion *otraCancion = listadoCanciones->get(i);
+
+            if (otraCancion != c)
+            {
+              listaReproduccion->append(otraCancion);
+            }
           }
-        }
 
-        listaReproduccion->activarAleatorio();
+          listaReproduccion->activarAleatorio();
 
-        listaReproduccion->setReproduciendo(true);
+          listaReproduccion->setReproduciendo(true);
 
-guardarEstado();
+          guardarEstado();
 
           cout << "Reproduciendo: " << c->mostrar() << endl;
         }
@@ -315,7 +320,7 @@ guardarEstado();
 
       int nuevoId = listadoCanciones->lentejas() + 1;
 
-      Cancion *c = new Cancion(nuevoId, titulo, autor, album, year, duracion, ruta);
+      Cancion *c = new Cancion(nuevoId, titulo, autor, album, year, duracion, ruta, 0);
 
       listadoCanciones->append(c);
 
@@ -325,42 +330,42 @@ guardarEstado();
     }
     else if (opcionL[0] == 'D' || opcionL[0] == 'd')
     {
-    
-    if (opcionL.length() > 1)
-      {
-      int num;
 
-    try
-    {
-      num = stoi(opcionL.substr(1));
-    }
-    catch (...)
-    {
-      cout << "Numero invalido." << endl;
-      continue;
+      if (opcionL.length() > 1)
+      {
+        int num;
+
+        try
+        {
+          num = stoi(opcionL.substr(1));
+        }
+        catch (...)
+        {
+          cout << "Numero invalido." << endl;
+          continue;
+        }
+        if (num >= 1 && num <= listadoCanciones->lentejas())
+        {
+          Cancion *c = listadoCanciones->get(num - 1);
+          cout << "Eliminando: " << c->mostrar() << endl;
+
+          listaReproduccion->eliminarCancion(c);
+          listadoCanciones->removeAt(num - 1);
+
+          cout << "Cancion eliminada correctamente." << endl;
+          guardarMusicSource();
+          guardarEstado();
+        }
+        else
+        {
+          cout << "Numero invalido." << endl;
+        }
       }
-    if (num >= 1 && num <= listadoCanciones->lentejas())
+      else
       {
-      Cancion *c = listadoCanciones->get(num - 1);
-      cout << "Eliminando: " << c->mostrar() << endl;
-
-      listaReproduccion->eliminarCancion(c);
-      listadoCanciones->removeAt(num - 1);
-
-      cout << "Cancion eliminada correctamente." << endl;
-      guardarMusicSource();
-      guardarEstado();
+        cout << "Debes ingresar un numero. Ej: D3" << endl;
+      }
     }
-    else
-    {
-      cout << "Numero invalido." << endl;
-    }
-   }
-   else
-   {
-    cout << "Debes ingresar un numero. Ej: D3" << endl;
-  }
-  }
 
     else
     {
@@ -375,6 +380,7 @@ void cleanUp()
   delete listaReproduccion;
   delete listadoCanciones;
 };
+
 void menuListaReproduccion()
 {
   string opcionA;
@@ -400,19 +406,19 @@ void menuListaReproduccion()
     else if (opcionA[0] == 'S' || opcionA[0] == 's')
     {
       if (opcionA.length() > 1)
-      { 
-    
+      {
+
         int num;
 
-    try
-      {
-        num = stoi(opcionA.substr(1));
-      }
-    catch (...)
-      {
-        cout << "Numero invalido." << endl;
-        continue;
-      }
+        try
+        {
+          num = stoi(opcionA.substr(1));
+        }
+        catch (...)
+        {
+          cout << "Numero invalido." << endl;
+          continue;
+        }
 
         listaReproduccion->saltarA(num);
         guardarEstado();
@@ -453,6 +459,7 @@ void cambiarRepeticion()
 
   estado = (estado + 1) % 3;
 }
+
 void guardarEstado()
 {
   fstream arch("../status.cfg", ios::out);
@@ -471,8 +478,48 @@ void guardarEstado()
   arch.close();
 }
 
+void menuBuscar()
+{
+}
 
+void menuTop()
+{
+  Heap<Cancion *> *heap = new Heap(listadoCanciones);
+  cout << "Ranking TOP\n C - Top 10 canciones más escuchadas\nA - Top 10 artistas más escuchados\nX - Salir" << endl;
 
+  string opcion;
+  cout << "Ingrese Opción: ";
+  cin >> opcion;
+  while (opcion != "X")
+  {
+    if (opcion == "C")
+    {
+      cout << heap->mostrarTop('C') << endl;
+      cout << "Opciones:" << endl;
+      cout << "R<num> - Reproducir canción seleccionada\nA<num> Agregar canción seleccionada al final de la lista de reproducción actual\nA – Top 10 artistas más escuchados\nV – Volver al menú principal" << endl;
+
+      cin >> opcion;
+
+      if (opcion == "V")
+      {
+        break;
+      }
+    }
+    if (opcion == "A")
+    {
+      cout << heap->mostrarTop('A') << endl;
+      cout << "Opciones:" << endl;
+      cout << "S<num> - Mostrar canciones del artista\nC - Top 10 canciones más escuchadas\nV - Volver al menú principal" << endl;
+
+      cin >> opcion;
+
+      if (opcion == "V")
+      {
+        break;
+      }
+    }
+  }
+}
 
 int main()
 {
@@ -519,13 +566,18 @@ int main()
     case 'R':
       cambiarRepeticion();
       guardarEstado();
-
       break;
     case 'A':
       menuListaReproduccion();
       break;
     case 'L':
       menuCanciones();
+      break;
+    case 'F':
+      menuBuscar();
+      break;
+    case 'T':
+      menuTop();
       break;
     case 'X':
       guardarEstado();
@@ -537,6 +589,6 @@ int main()
     }
   } while (opcion != 'X');
 
-  cleanUp();  
+  cleanUp();
   return 0;
 }

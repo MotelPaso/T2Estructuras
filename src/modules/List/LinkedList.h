@@ -15,6 +15,7 @@ public:
   int lentejas();
   void append(T data);
   T get(int index);
+  Node<T> *getPunteroAt(int index);
   bool isEmpty();
   std::string mostrar();
   void removeAt(int index);

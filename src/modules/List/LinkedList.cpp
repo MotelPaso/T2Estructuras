@@ -1,6 +1,7 @@
 #include "LinkedList.h"
 #include "../Node.h"
 #include <string>
+#include <stdexcept>
 
 template <typename T>
 LinkedList<T>::~LinkedList()

@@ -3,67 +3,83 @@
 #include "../List/LinkedList.h"
 #include "../Node.h"
 
-#include <vector>
 #include <string>
+
+using namespace std;
+
+// para acumular las reproducciones totales por artista.
+// Se usa solo dentro del Heap para el ranking de artistas, no se guarda
+
+class ArtistaStat
+{
+public:
+  string nombreArtista;
+  int totalReproducciones;
+  LinkedList<Cancion *> *cancionesDelArtista;
+
+  ArtistaStat()
+  {
+    nombreArtista = "";
+    totalReproducciones = 0;
+    cancionesDelArtista = new LinkedList<Cancion *>();
+  }
+};
 
 template <typename T>
 class Heap
 {
-  // Esto debe ser un max Heap
-  // Para que los mayores esten arriba
+  // max heap
+ 
+  Node<T> **list;
+  int cantidad;
+  int capacidad;
 
-  vector<Node<T> *> list;
+  // arreglo de estadisticas por artista, usado solo para el ranking de artistas
+  ArtistaStat *artistas;
+  int cantidadArtistas;
 
 private:
   void heapify(int indice, int heapSize);
+  void agrandarSiEsNecesario();
 
 public:
   Heap(LinkedList<T> *canciones)
   {
-    for (int i = 0; i < canciones->lentejas(); i++)
+    cantidad = canciones->lentejas();
+    capacidad = cantidad > 0 ? cantidad : 1;
+    list = new Node<T> *[capacidad];
+
+    for (int i = 0; i < cantidad; i++)
     {
-      list.push_back(canciones->getPunteroAt(i));
+      list[i] = canciones->getPunteroAt(i);
     }
+
+    artistas = nullptr;
+    cantidadArtistas = 0;
   };
+
   ~Heap()
   {
-    delete list;
+    delete[] list;
+
+    if (artistas != nullptr)
+    {
+      for (int i = 0; i < cantidadArtistas; i++)
+      {
+        delete artistas[i].cancionesDelArtista;
+      }
+      delete[] artistas;
+    }
   }
 
   void cancionSort();
   void artistaSort();
-  std::string mostrarTop(char s)
-  {
 
-    int limit = list.size();
-    if (limit > 10)
-    {
-      limit = 10;
-    }
-    std::string salida = "Ranking TOP " + std::to_string(limit);
-    if (s == 'C')
-    {
-      salida += " Canciones más escuchadas:\n";
-      this->cancionSort();
-    }
-    if (s == 'A')
-    {
-      salida += " Artistas más escuchados:\n";
-      this->artistaSort();
-    }
-    for (int i = 0; i < limit; i++)
-    {
-      salida += std::to_string(i + 1);
-      salida += ". [";
-      salida += std::to_string(list[i]->getData()->getCantReproducciones());
-      salida += "] ";
-      if (s == 'C')
-        salida += list[i]->getData()->getTitulo();
-      salida += list[i]->getData()->getAutor();
-      salida += '\n';
-    }
-    return salida;
-  };
+  LinkedList<Cancion *> *getCancionesDeArtista(int posicion);
+
+  Cancion *getCancionEnPosicion(int posicion);
+
+  string mostrarTop(char s);
 };
 
 #include "Heap.cpp"

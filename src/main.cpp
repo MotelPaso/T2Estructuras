@@ -7,12 +7,26 @@
 #include "modules/Cancion/Cancion.h"
 #include "modules/ListaReproduccion/ListaReproduccion.h"
 #include "modules/Heap/Heap.h"
+#include "modules/Trie/Trie.h"
 using namespace std;
 
 // global lists
 LinkedList<Cancion *> *listadoCanciones = new LinkedList<Cancion *>();
 ListaReproduccion *listaReproduccion = new ListaReproduccion();
+Trie *trieCanciones = new Trie();
 void guardarEstado();
+
+
+void reconstruirTrie(){
+  delete trieCanciones;
+  trieCanciones = new Trie();
+
+  for (int i = 0; i < listadoCanciones->lentejas(); i++)
+  {
+    trieCanciones->insertarCancion(listadoCanciones->get(i));
+  }
+}
+
 void limpiarPantalla()
 {
 #ifdef _WIN32
@@ -327,6 +341,7 @@ void menuCanciones()
       cout << "Cancion agregada correctamente." << endl;
       guardarMusicSource();
       guardarEstado();
+      reconstruirTrie();
     }
     else if (opcionL[0] == 'D' || opcionL[0] == 'd')
     {
@@ -355,6 +370,7 @@ void menuCanciones()
           cout << "Cancion eliminada correctamente." << endl;
           guardarMusicSource();
           guardarEstado();
+          reconstruirTrie();
         }
         else
         {
@@ -379,6 +395,7 @@ void cleanUp()
 {
   delete listaReproduccion;
   delete listadoCanciones;
+  delete trieCanciones;
 };
 
 void menuListaReproduccion()
@@ -478,53 +495,480 @@ void guardarEstado()
   arch.close();
 }
 
+void menuResultadosBusqueda(LinkedList<Cancion *> *resultados, string textoBuscado)
+{
+  string opcionF;
+
+  do
+  {
+    cout << endl;
+    cout << "Búsqueda de canciones" << endl;
+    cout << "Canciones que contienen \"" << textoBuscado << "\":" << endl;
+
+    if (resultados->isEmpty())
+    {
+      cout << "No se encontraron coincidencias." << endl;
+    }
+    else
+    {
+      cout << resultados->mostrar();
+    }
+
+    cout << "Opciones:" << endl;
+    cout << "R<num> - Reproducir canción seleccionada" << endl;
+    cout << "A<num> - Agregar canción seleccionada al final de la lista de reproducción actual" << endl;
+    cout << "F - Repetir búsqueda con un texto diferente" << endl;
+    cout << "V - Volver al menú principal" << endl;
+    cout << "Ingrese Opción: ";
+
+    cin >> opcionF;
+
+    if (opcionF == "V" || opcionF == "v")
+    {
+      delete resultados;
+      return;
+    }
+    else if (opcionF == "F" || opcionF == "f")
+    {
+      delete resultados;
+
+      string nuevoTexto;
+      cout << "Buscar canciones que contengan: ";
+      cin.ignore();
+      getline(cin, nuevoTexto);
+
+      if (nuevoTexto.empty())
+      {
+        return;
+      }
+
+      LinkedList<Cancion *> *nuevosResultados = trieCanciones->buscar(nuevoTexto);
+      menuResultadosBusqueda(nuevosResultados, nuevoTexto);
+      return;
+    }
+    else if (opcionF[0] == 'A' || opcionF[0] == 'a')
+    {
+      if (opcionF.length() > 1)
+      {
+        int num;
+
+        try
+        {
+          num = stoi(opcionF.substr(1));
+        }
+        catch (...)
+        {
+          cout << "Numero invalido." << endl;
+          continue;
+        }
+
+        if (num >= 1 && num <= resultados->lentejas())
+        {
+          Cancion *c = resultados->get(num - 1);
+          listaReproduccion->append(c);
+          guardarEstado();
+
+          cout << c->mostrar() << " agregada a la lista." << endl;
+        }
+        else
+        {
+          cout << "Numero invalido." << endl;
+        }
+      }
+      else
+      {
+        cout << "Debes ingresar un numero. Ej: A1" << endl;
+      }
+    }
+    else if (opcionF[0] == 'R' || opcionF[0] == 'r')
+    {
+      if (opcionF.length() > 1)
+      {
+        int num;
+
+        try
+        {
+          num = stoi(opcionF.substr(1));
+        }
+        catch (...)
+        {
+          cout << "Numero invalido." << endl;
+          continue;
+        }
+
+        if (num >= 1 && num <= resultados->lentejas())
+        {
+          Cancion *c = resultados->get(num - 1);
+          listaReproduccion->clear();
+
+          listaReproduccion->append(c);
+
+          for (int i = 0; i < listadoCanciones->lentejas(); i++)
+          {
+            Cancion *otraCancion = listadoCanciones->get(i);
+
+            if (otraCancion != c)
+            {
+              listaReproduccion->append(otraCancion);
+            }
+          }
+
+          listaReproduccion->activarAleatorio();
+          listaReproduccion->setReproduciendo(true);
+
+          guardarEstado();
+
+          cout << "Reproduciendo: " << c->mostrar() << endl;
+        }
+        else
+        {
+          cout << "Numero invalido." << endl;
+        }
+      }
+      else
+      {
+        cout << "Debes ingresar un numero." << endl;
+      }
+    }
+    else
+    {
+      cout << "Opcion no valida." << endl;
+    }
+
+  } while (true);
+}
+
 void menuBuscar()
 {
+  string textoBuscado;
+
+  cout << endl;
+  cout << "Búsqueda de canciones" << endl;
+  cout << "Buscar canciones que contengan: ";
+  cin.ignore();
+  getline(cin, textoBuscado);
+
+  if (textoBuscado.empty())
+  {
+    return;
+  }
+
+  LinkedList<Cancion *> *resultados = trieCanciones->buscar(textoBuscado);
+  menuResultadosBusqueda(resultados, textoBuscado);
+}
+
+void menuCancionesDeArtista(Heap<Cancion *> *heap, int posicionArtista)
+{
+  string opcion;
+
+  do
+  {
+    LinkedList<Cancion *> *cancionesArtista = heap->getCancionesDeArtista(posicionArtista);
+
+    cout << endl;
+    cout << "Ranking TOP 10 Artistas más escuchados:" << endl;
+
+    if (cancionesArtista == nullptr || cancionesArtista->isEmpty())
+    {
+      cout << "No hay canciones registradas para este artista." << endl;
+    }
+    else
+    {
+      cout << cancionesArtista->mostrar();
+    }
+
+    cout << "Opciones:" << endl;
+    cout << "R<num> - Reproducir canción seleccionada" << endl;
+    cout << "A<num> - Agregar canción seleccionada al final de la lista de reproducción actual" << endl;
+    cout << "V – Volver al listado de TOP 10 artistas" << endl;
+    cout << "X – Volver al menú principal" << endl;
+    cout << "Ingrese Opción: ";
+
+    cin >> opcion;
+
+    if (opcion == "X" || opcion == "x")
+    {
+      return;
+    }
+    else if (opcion == "V" || opcion == "v")
+    {
+      break; // vuelve al listado de artistas (continua el ciclo de afuera)
+    }
+    else if (cancionesArtista != nullptr && (opcion[0] == 'A' || opcion[0] == 'a'))
+    {
+      if (opcion.length() > 1)
+      {
+        int num;
+
+        try
+        {
+          num = stoi(opcion.substr(1));
+        }
+        catch (...)
+        {
+          cout << "Numero invalido." << endl;
+          continue;
+        }
+
+        if (num >= 1 && num <= cancionesArtista->lentejas())
+        {
+          Cancion *c = cancionesArtista->get(num - 1);
+          listaReproduccion->append(c);
+          guardarEstado();
+
+          cout << c->mostrar() << " agregada a la lista." << endl;
+        }
+        else
+        {
+          cout << "Numero invalido." << endl;
+        }
+      }
+      else
+      {
+        cout << "Debes ingresar un numero. Ej: A1" << endl;
+      }
+    }
+    else if (cancionesArtista != nullptr && (opcion[0] == 'R' || opcion[0] == 'r'))
+    {
+      if (opcion.length() > 1)
+      {
+        int num;
+
+        try
+        {
+          num = stoi(opcion.substr(1));
+        }
+        catch (...)
+        {
+          cout << "Numero invalido." << endl;
+          continue;
+        }
+
+        if (num >= 1 && num <= cancionesArtista->lentejas())
+        {
+          Cancion *c = cancionesArtista->get(num - 1);
+          listaReproduccion->clear();
+          listaReproduccion->append(c);
+
+          for (int i = 0; i < listadoCanciones->lentejas(); i++)
+          {
+            Cancion *otraCancion = listadoCanciones->get(i);
+
+            if (otraCancion != c)
+            {
+              listaReproduccion->append(otraCancion);
+            }
+          }
+
+          listaReproduccion->activarAleatorio();
+          listaReproduccion->setReproduciendo(true);
+          guardarEstado();
+
+          cout << "Reproduciendo: " << c->mostrar() << endl;
+        }
+        else
+        {
+          cout << "Numero invalido." << endl;
+        }
+      }
+      else
+      {
+        cout << "Debes ingresar un numero." << endl;
+      }
+    }
+    else
+    {
+      cout << "Opcion no valida." << endl;
+    }
+
+  } while (true);
 }
 
 void menuTop()
 {
-  Heap<Cancion *> *heap = new Heap(listadoCanciones);
-  cout << "Ranking TOP\n C - Top 10 canciones más escuchadas\nA - Top 10 artistas más escuchados\nX - Salir" << endl;
+  if (listadoCanciones->isEmpty())
+  {
+    cout << "No hay canciones registradas." << endl;
+    return;
+  }
 
+  Heap<Cancion *> *heap = new Heap<Cancion *>(listadoCanciones);
   string opcion;
+
+  cout << "Ranking TOP" << endl;
+  cout << "C - Top 10 canciones más escuchadas" << endl;
+  cout << "A - Top 10 artistas más escuchados" << endl;
+  cout << "X - Salir" << endl;
   cout << "Ingrese Opción: ";
   cin >> opcion;
-  while (opcion != "X")
+
+  while (opcion != "X" && opcion != "x")
   {
-    if (opcion == "C")
+    if (opcion == "C" || opcion == "c")
     {
       cout << heap->mostrarTop('C') << endl;
       cout << "Opciones:" << endl;
-      cout << "R<num> - Reproducir canción seleccionada\nA<num> Agregar canción seleccionada al final de la lista de reproducción actual\nA – Top 10 artistas más escuchados\nV – Volver al menú principal" << endl;
+      cout << "R<num> - Reproducir canción seleccionada" << endl;
+      cout << "A<num> - Agregar canción seleccionada al final de la lista de reproducción actual" << endl;
+      cout << "A – Top 10 artistas más escuchados" << endl;
+      cout << "V – Volver al menú principal" << endl;
+      cout << "Ingrese Opción: ";
 
       cin >> opcion;
 
-      if (opcion == "V")
+      if (opcion == "V" || opcion == "v")
       {
         break;
       }
+      else if (opcion[0] == 'R' || opcion[0] == 'r')
+      {
+        if (opcion.length() > 1)
+        {
+          int num;
+
+          try
+          {
+            num = stoi(opcion.substr(1));
+          }
+          catch (...)
+          {
+            cout << "Numero invalido." << endl;
+            opcion = "C";
+            continue;
+          }
+
+          Cancion *c = heap->getCancionEnPosicion(num);
+
+          if (c != nullptr)
+          {
+            listaReproduccion->clear();
+            listaReproduccion->append(c);
+
+            for (int i = 0; i < listadoCanciones->lentejas(); i++)
+            {
+              Cancion *otraCancion = listadoCanciones->get(i);
+
+              if (otraCancion != c)
+              {
+                listaReproduccion->append(otraCancion);
+              }
+            }
+
+            listaReproduccion->activarAleatorio();
+            listaReproduccion->setReproduciendo(true);
+            guardarEstado();
+
+            cout << "Reproduciendo: " << c->mostrar() << endl;
+          }
+          else
+          {
+            cout << "Numero invalido." << endl;
+          }
+        }
+        opcion = "C";
+        continue;
+      }
+      else if (opcion[0] == 'A' && opcion.length() > 1)
+      {
+        int num;
+
+        try
+        {
+          num = stoi(opcion.substr(1));
+        }
+        catch (...)
+        {
+          cout << "Numero invalido." << endl;
+          opcion = "C";
+          continue;
+        }
+
+        Cancion *c = heap->getCancionEnPosicion(num);
+
+        if (c != nullptr)
+        {
+          listaReproduccion->append(c);
+          guardarEstado();
+          cout << c->mostrar() << " agregada a la lista." << endl;
+        }
+        else
+        {
+          cout << "Numero invalido." << endl;
+        }
+
+        opcion = "C";
+        continue;
+      }
+      else if (opcion == "A")
+      {
+        opcion = "A"; // cae al bloque de abajo en la siguiente iteracion
+        continue;
+      }
+      else
+      {
+        opcion = "C";
+        continue;
+      }
     }
-    if (opcion == "A")
+
+    if (opcion == "A" || opcion == "a")
     {
       cout << heap->mostrarTop('A') << endl;
       cout << "Opciones:" << endl;
-      cout << "S<num> - Mostrar canciones del artista\nC - Top 10 canciones más escuchadas\nV - Volver al menú principal" << endl;
+      cout << "S<num> - Mostrar canciones del artista" << endl;
+      cout << "C - Top 10 canciones más escuchadas" << endl;
+      cout << "V - Volver al menú principal" << endl;
+      cout << "Ingrese Opción: ";
 
       cin >> opcion;
 
-      if (opcion == "V")
+      if (opcion == "V" || opcion == "v")
       {
         break;
       }
+      else if (opcion[0] == 'S' || opcion[0] == 's')
+      {
+        if (opcion.length() > 1)
+        {
+          int num;
+
+          try
+          {
+            num = stoi(opcion.substr(1));
+          }
+          catch (...)
+          {
+            cout << "Numero invalido." << endl;
+            opcion = "A";
+            continue;
+          }
+
+          menuCancionesDeArtista(heap, num);
+        }
+
+        opcion = "A";
+        continue;
+      }
+      else if (opcion == "C" || opcion == "c")
+      {
+        continue;
+      }
+      else
+      {
+        opcion = "A";
+        continue;
+      }
     }
   }
+
+  delete heap;
 }
 
 int main()
 {
   bool musicaCargada = cargarMusica();
   bool optionsCargadas = cargarOpciones();
+  reconstruirTrie();
   if (!(musicaCargada && optionsCargadas))
   {
     if (!musicaCargada)

@@ -118,7 +118,10 @@ void ListaReproduccion::remove()
 
 bool ListaReproduccion::estaReproduciendo()
 {
-  this->actual->cancion->agregarReproduccion(); // sumar uno a la wea
+  if (this->actual != nullptr)
+  {
+    this->actual->cancion->agregarReproduccion(); // sumar uno a la wea
+  }
   return this->reproduciendo;
 }
 bool ListaReproduccion::esAleatorio()

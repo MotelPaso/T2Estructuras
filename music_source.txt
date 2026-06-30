@@ -14,3 +14,4 @@
 14,Bohemian Rhapsody,Queen,A Night at the Opera,1975,354,music/queen/bohemian_rhapsody.mp3,0
 15,Blinding Lights,The Weeknd,After Hours,2019,200,music/the_weeknd/blinding_lights.mp3,0
 16,DIEGO,MALEBRAN,FF,2005,123,music_source.txt,0
+17,maggots for brains,Olivia Rodrigo,you seem pretty sad for a girl so in love,2026,240,music/oliviarodrigo/maggotsforbrains.mp3,0
